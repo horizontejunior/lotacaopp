@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
       <h1 className="text-3xl font-extrabold text-yellow-500 mb-8 uppercase tracking-wide">
-        Intenção de Vaga PP 2025
+        Intenção de Vaga PPSC 2025
       </h1>
 
       <form className="bg-gray-800 p-8 rounded-xl shadow-2xl w-96">
