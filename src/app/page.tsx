@@ -5,23 +5,30 @@ import { useState } from 'react';
 export default function Home() {
   const [gender, setGender] = useState<string>('');
   const [city, setCity] = useState<string>('');
-
-  function handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
-    event.preventDefault(); // Evita o recarregamento da página
-
-    const registration = (document.getElementById('registration') as HTMLInputElement)?.value;
-    const candidateName = (document.getElementById('candidateName') as HTMLInputElement)?.value;
-    const score = (document.getElementById('score') as HTMLInputElement)?.value;
-
-    console.log({
-      registration,
-      candidateName,
-      score,
-      gender,
-      city,
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+  
+    const registration = (document.getElementById('registration') as HTMLInputElement).value;
+    const candidateName = (document.getElementById('candidateName') as HTMLInputElement).value;
+    const score = parseFloat((document.getElementById('score') as HTMLInputElement).value);
+    const genderInput = document.querySelector('input[name="gender"]:checked') as HTMLInputElement;
+    const city = (document.getElementById('city') as HTMLSelectElement).value;
+  
+    const gender = genderInput ? genderInput.value : null;
+  
+    if (!registration || !candidateName || isNaN(score) || !gender || !city) {
+      alert('Preencha todos os campos corretamente!');
+      return;
+    }
+  
+    const response = await fetch('/api/candidates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ registration, candidateName, score, gender, city }),
     });
-
-    // Aqui você pode chamar a API para salvar os dados no banco
+  
+    const result = await response.json();
+    alert(result.message || result.error);
   }
 
   return (
