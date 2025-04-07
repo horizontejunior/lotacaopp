@@ -8,14 +8,14 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: Request) {
   try {
-    const { registration, candidateName, score, gender, city } = await req.json();
+    const { candidateName, score, location, gender, intention } = await req.json();
 
-    if (!registration || !candidateName || !score || !gender || !city) {
+    if (!candidateName || !score || !location || !gender || !intention) {
       return NextResponse.json({ error: 'Todos os campos são obrigatórios.' }, { status: 400 });
     }
 
     const { data, error } = await supabase.from('candidates').insert([
-      { registration, candidateName, score, gender, city }
+      { candidateName, score, location, gender, intention}
     ]);
 
     if (error) throw error;
