@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
@@ -21,6 +21,7 @@ type City = {
   id: number;
   city_name: string;
 };
+
 
 export default function CandidatoList() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -51,6 +52,7 @@ export default function CandidatoList() {
     if (selectedGender !== 'todos') {
       filtered = filtered.filter(c => c.gender === selectedGender);
     }
+
     filtered.sort((a, b) => b.score - a.score);
     setFilteredCandidates(filtered);
   }, [candidates, selectedCity, selectedGender]);
@@ -65,6 +67,7 @@ export default function CandidatoList() {
       <h1 className="text-3xl font-bold text-yellow-500 mb-6 text-center uppercase">Lista de Candidatos</h1>
 
       <div className="flex flex-col md:flex-row justify-center gap-4 mb-6">
+        {/* Filtros de Cidade e Sexo */}
         <div>
           <label className="block mb-1 font-semibold text-yellow-500">Filtrar por Cidade:</label>
           <select
@@ -99,6 +102,7 @@ export default function CandidatoList() {
         <table className="min-w-full bg-gray-800 rounded-xl overflow-hidden">
           <thead className="bg-yellow-500 text-gray-900">
             <tr>
+              <th className="px-4 py-2 text-left">Ordem</th>
               <th className="px-4 py-2 text-left">Nome</th>
               <th className="px-4 py-2 text-left">Nota</th>
               <th className="px-4 py-2 text-left">Sexo</th>
@@ -107,8 +111,9 @@ export default function CandidatoList() {
             </tr>
           </thead>
           <tbody>
-            {filteredCandidates.map((candidato) => (
+          {filteredCandidates.map((candidato: Candidate, index: number) => (
               <tr key={candidato.id} className="border-b border-gray-700">
+                <td className="px-4 py-2">{index + 1}</td>
                 <td className="px-4 py-2">{candidato.candidateName}</td>
                 <td className="px-4 py-2">{candidato.score.toFixed(2)}</td>
                 <td className="px-4 py-2">{candidato.gender}</td>
@@ -118,7 +123,7 @@ export default function CandidatoList() {
             ))}
             {filteredCandidates.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-4 text-gray-400">
+                <td colSpan={6} className="text-center py-4 text-gray-400">
                   Nenhum candidato encontrado com os filtros selecionados.
                 </td>
               </tr>
