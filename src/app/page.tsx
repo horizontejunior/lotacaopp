@@ -80,9 +80,9 @@ export default function LoginPage() {
         {message && <p className="mt-4 text-center text-red-500">{message}</p>}
 
         {/* Link para a página de cadastro */}
-        <p className="mt-4 text-center text-gray-600">
+        <p className="mt-4 text-center text-gray-400">
           Ainda não tem conta{" "}
-          <Link href="/register" className="text-blue-500 hover:underline">
+          <Link href="/register" className="text-yellow-500 hover:underline">
             Crie aqui
           </Link>
         </p>
