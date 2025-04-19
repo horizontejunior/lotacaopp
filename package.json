@@ -9,18 +9,29 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-input/mask": "^2.0.4",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
+    "cleave.js": "^1.6.0",
+    "jose": "^6.0.10",
     "next": "15.2.4",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-input-mask-next": "^3.0.0-alpha.12",
+    "react-number-format": "^5.4.4",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/cleave.js": "^1.4.12",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-input-mask": "^3.0.6",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "tailwindcss": "^4",

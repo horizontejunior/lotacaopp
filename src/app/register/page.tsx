@@ -1,66 +1,65 @@
 'use client'
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
 
 export default function Home() {
   const [gender, setGender] = useState<string>('');
-  const [intention, setIntention] = useState<string>('');
-  const [cities, setCities] = useState<{ id: number; city_name: string }[]>([]);
-  const [selectedCity, setSelectedCity] = useState<string>('');
-
-  useEffect(() => {
-    const fetchCities = async () => {
-      const { data, error } = await supabase.from('city').select('id, city_name').order('city_name');
-      if (error) console.error('Erro ao buscar cidades:', error);
-      else setCities(data || []);
-    };
-    fetchCities();
-  }, []);
+  const [registration, setRegistration] = useState('');
+  const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
   
     const candidateName = (document.getElementById('candidateName') as HTMLInputElement).value;
-    const score = parseFloat((document.getElementById('score') as HTMLInputElement).value);
+    const password = parseFloat((document.getElementById('password') as HTMLInputElement).value);
     const genderInput = document.querySelector('input[name="gender"]:checked') as HTMLInputElement;
     const gender = genderInput ? genderInput.value : null;
   
-    if (!candidateName || isNaN(score) || !gender || !intention || !selectedCity) {
+    if (!registration || !candidateName || !gender || !password) {
       alert('Preencha todos os campos corretamente!');
       return;
     }
+
   
     const response = await fetch('/api/candidates', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        registration: registration,
         candidateName,
-        score,
         gender,
-        intention,
-        location: selectedCity,
+        password,
       }),
     });
   
     const result = await response.json();
     alert(result.message || result.error);
+    router.push("./")
   }
   
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-extrabold text-yellow-500 mb-8 uppercase tracking-wide">
-        Intenção de Vaga PPSC 2025
-      </h1>
 
       <form className="bg-gray-800 p-8 rounded-xl shadow-2xl w-96">
         <h2 className="text-center text-2xl font-bold text-yellow-500 mb-6">Cadastro de Candidatos</h2>
+
+        <input
+          type="number"
+          value={registration}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value.length <= 5) {
+              setRegistration(value);
+            }
+          }}
+          placeholder="Inscrição"
+          className="w-full p-2 mb-4 rounded bg-gray-700 border border-yellow-500 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          required
+          />
 
         <input
           id="candidateName"
@@ -69,30 +68,14 @@ export default function Home() {
           className="w-full p-2 mb-4 rounded bg-gray-700 border border-yellow-500 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
 
+        
         <input
-          id="score"
-          type="number"
-          step={0.01}
-          placeholder="Nota final (Ex: 7,98)"
+          id="password"
+          placeholder="Senha"
+          type="password"
           required
           className="w-full p-2 mb-4 rounded bg-gray-700 border border-yellow-500 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
-
-        <div className="mb-4">
-          <label htmlFor="location" className="block text-yellow-500 font-bold mb-2">Cidade desejada:</label>
-          <select
-            id="location"
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.target.value)}
-            required
-            className="w-full p-2 rounded bg-gray-700 border border-yellow-500 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          >
-            <option value="">Selecione uma cidade</option>
-            {cities.map((city) => (
-              <option key={city.id} value={city.id}>{city.city_name}</option>
-            ))}
-          </select>
-        </div>
 
         <div className="mb-4">
           <label className="block text-yellow-500 font-bold mb-2">Sexo:</label>
@@ -120,24 +103,6 @@ export default function Home() {
               Feminino
             </label>
           </div>
-        </div>
-
-        <div className="mb-6">
-          <label htmlFor="intention" className="block text-yellow-500 font-bold mb-2">
-            Nível de interesse:
-          </label>
-          <select
-            id="intention"
-            value={intention}
-            onChange={(e) => setIntention(e.target.value)}
-            required
-            className="w-full p-2 rounded bg-gray-700 border border-yellow-500 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          >
-            <option value="">Selecione um</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
         </div>
 
         <button

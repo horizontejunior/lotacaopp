@@ -1,12 +1,18 @@
-"use client"
+'use client';
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { useSession } from "next-auth/react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+
+type City = {
+  id: number;
+  city_name: string;
+};
 
 type Candidate = {
   id: number;
@@ -14,29 +20,66 @@ type Candidate = {
   score: number;
   gender: string;
   intention: string;
-  location: string;
+  city: City;
 };
 
-type City = {
+type RawCandidate = {
   id: number;
-  city_name: string;
+  score: number;
+  gender: string;
+  level: string;
+  registration: {
+    candidateName: string;
+  } | null;
+  city: {
+    id: number;
+    city_name: string;
+  } | null;
 };
-
 
 export default function CandidatoList() {
+  
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [filteredCandidates, setFilteredCandidates] = useState<Candidate[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCity, setSelectedCity] = useState<string>('todos');
   const [selectedGender, setSelectedGender] = useState<string>('todos');
-
+  const { data: session } = useSession();
   useEffect(() => {
     const fetchData = async () => {
-      const { data: cityData } = await supabase.from('city').select('*');
+      const { data: cityData, error: cityError } = await supabase
+        .from('city')
+        .select('*');
+
+      if (cityError) {
+        console.error('Erro ao buscar cidades:', cityError);
+        return;
+      }
+
       setCities(cityData || []);
 
-      const { data: candidateData } = await supabase.from('candidates').select('*');
-      setCandidates(candidateData || []);
+      const { data: candidateData, error: candidateError } = await supabase
+        .from('intentions')
+        .select('id, score, gender, level, registration (candidateName), city (id, city_name)');
+
+      if (candidateError) {
+        console.error('Erro ao buscar candidatos:', candidateError);
+        return;
+      }
+
+      const transformed: Candidate[] = (candidateData as unknown as RawCandidate[]).map((c) => ({
+        id: c.id,
+        candidateName: c.registration?.candidateName || 'Desconhecido',
+        score: c.score,
+        gender: c.gender,
+        intention: c.level,
+        city: {
+          id: c.city?.id ?? 0,
+          city_name: c.city?.city_name ?? 'Desconhecida',
+        },
+      }));
+
+      setCandidates(transformed);
     };
 
     fetchData();
@@ -46,7 +89,7 @@ export default function CandidatoList() {
     let filtered = [...candidates];
 
     if (selectedCity !== 'todos') {
-      filtered = filtered.filter(c => c.location === selectedCity);
+      filtered = filtered.filter(c => c.city.id.toString() === selectedCity);
     }
 
     if (selectedGender !== 'todos') {
@@ -56,18 +99,18 @@ export default function CandidatoList() {
     filtered.sort((a, b) => b.score - a.score);
     setFilteredCandidates(filtered);
   }, [candidates, selectedCity, selectedGender]);
-
-  const getCityName = (id: string) => {
-    const city = cities.find(c => c.id.toString() === id);
-    return city ? city.city_name : 'Desconhecida';
-  };
-
+  if (!session) {
+    return (
+      <p className="w-full flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+        Acesso negado. Faça login para continuar.
+      </p>
+    );
+  }
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <h1 className="text-3xl font-bold text-yellow-500 mb-6 text-center uppercase">Lista de Candidatos</h1>
 
       <div className="flex flex-col md:flex-row justify-center gap-4 mb-6">
-        {/* Filtros de Cidade e Sexo */}
         <div>
           <label className="block mb-1 font-semibold text-yellow-500">Filtrar por Cidade:</label>
           <select
@@ -111,14 +154,14 @@ export default function CandidatoList() {
             </tr>
           </thead>
           <tbody>
-          {filteredCandidates.map((candidato: Candidate, index: number) => (
+            {filteredCandidates.map((candidato, index) => (
               <tr key={candidato.id} className="border-b border-gray-700">
                 <td className="px-4 py-2">{index + 1}</td>
                 <td className="px-4 py-2">{candidato.candidateName}</td>
                 <td className="px-4 py-2">{candidato.score.toFixed(2)}</td>
                 <td className="px-4 py-2">{candidato.gender}</td>
                 <td className="px-4 py-2">{candidato.intention}</td>
-                <td className="px-4 py-2">{getCityName(candidato.location)}</td>
+                <td className="px-4 py-2">{candidato.city.city_name}</td>
               </tr>
             ))}
             {filteredCandidates.length === 0 && (
