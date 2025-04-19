@@ -14,7 +14,7 @@ export default function Home() {
     event.preventDefault();
   
     const candidateName = (document.getElementById('candidateName') as HTMLInputElement).value;
-    const password = parseFloat((document.getElementById('password') as HTMLInputElement).value);
+    const password = (document.getElementById('password') as HTMLInputElement).value;
     const genderInput = document.querySelector('input[name="gender"]:checked') as HTMLInputElement;
     const gender = genderInput ? genderInput.value : null;
   
