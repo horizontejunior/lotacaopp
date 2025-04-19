@@ -4,8 +4,8 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   const supabase = createClient(
-    process.env.SUPABASE_URL || "https://ogrmujxqvbnzonnqppce.supabase.co",
-    process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ncm11anhxdmJuem9ubnFwcGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MTE0MTgsImV4cCI6MjA1OTI4NzQxOH0.y5LxewJ8XgGXQb4zKjjXhXUZ969APxhCzFyYG2p47K8"
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
   try {
